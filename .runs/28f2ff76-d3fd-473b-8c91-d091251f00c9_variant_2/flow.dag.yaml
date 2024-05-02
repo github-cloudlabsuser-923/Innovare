@@ -1,0 +1,70 @@
+inputs:
+  question:
+    type: string
+    default: How to use SDK V2?
+    is_chat_input: false
+outputs:
+  output:
+    type: string
+    reference: ${answer_the_question_with_context.output}
+    evaluation_only: false
+    is_chat_output: false
+nodes:
+- name: embed_the_query
+  type: python
+  source:
+    type: package
+    tool: promptflow.tools.embedding.embedding
+  inputs:
+    connection: "promptflowAI"
+    deployment_name: "text-embedding-ada-002"
+    input: "${inputs.question}"
+  aggregation: false
+- name: Search_queries_from_vectorindex
+  type: python
+  source:
+    type: package
+    tool: promptflow_vectordb.tool.common_index_lookup.search
+  inputs:
+    mlindex_content: "embeddings:\n  kind: none\n  schema_version: '2'\nindex:\n  api_version: 2023-07-01-Preview\n  connection:\n    id: /subscriptions/aaa7fc9e-0695-40bf-ab66-9f61e9283807/resourceGroups/odl_user_1314258-rg/providers/Microsoft.MachineLearningServices/workspaces/MLWS/connections/flowsearch\n  connection_type: workspace_connection\n  endpoint: https://openai-search-1314258.search.windows.net\n  engine: azure-sdk\n  field_mapping:\n    content: price\n    embedding: null\n    metadata: Product_Name\n  index: productindex\n  kind: acs\n  semantic_configuration_name: null\n"
+    queries: "${inputs.question}"
+    query_type: "Keyword"
+    top_k: 3
+  aggregation: false
+- name: generate_prompt_context
+  type: python
+  source:
+    type: code
+    path: generate_prompt_context.py
+  inputs:
+    search_result: "${Search_queries_from_vectorindex.output}"
+  aggregation: false
+- name: answer_the_question_with_context
+  type: llm
+  source:
+    type: code
+    path: answer_the_question_with_context.jinja2
+  inputs:
+    deployment_name: "gpt-35-turbo-16k"
+    temperature: 0
+    top_p: 1
+    max_tokens: 300
+    presence_penalty: 0
+    frequency_penalty: 0
+    prompt_text: "${Prompt_variants.output}"
+  api: chat
+  provider: AzureOpenAI
+  connection: promptflowAI
+  module: promptflow.tools.aoai
+  aggregation: false
+- name: Prompt_variants
+  type: prompt
+  source:
+    type: code
+    path: Prompt_variants__variant_2.jinja2
+  inputs:
+    contexts: "${generate_prompt_context.output}"
+    question: "${inputs.question}"
+  aggregation: false
+environment:
+  python_requirements_txt: requirements.txt

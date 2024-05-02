@@ -1,0 +1,88 @@
+id: bring_your_own_data_qna
+name: Bring Your Own Data QnA
+inputs:
+  question:
+    type: string
+    default: How to use SDK V2?
+    is_chat_input: false
+outputs:
+  output:
+    type: string
+    reference: ${answer_the_question_with_context.output}
+nodes:
+- name: embed_the_query
+  type: python
+  source:
+    type: package
+    tool: promptflow.tools.embedding.embedding
+  inputs:
+    connection: promptflowAI
+    deployment_name: text-embedding-ada-002
+    input: ${inputs.question}
+  use_variants: false
+- name: Search_queries_from_vectorindex
+  type: python
+  source:
+    type: package
+    tool: promptflow_vectordb.tool.common_index_lookup.search
+  inputs:
+    mlindex_content: >
+      embeddings:
+        kind: none
+        schema_version: '2'
+      index:
+        api_version: 2023-07-01-Preview
+        connection:
+          id: /subscriptions/aaa7fc9e-0695-40bf-ab66-9f61e9283807/resourceGroups/odl_user_1314258-rg/providers/Microsoft.MachineLearningServices/workspaces/MLWS/connections/flowsearch
+        connection_type: workspace_connection
+        endpoint: https://openai-search-1314258.search.windows.net
+        engine: azure-sdk
+        field_mapping:
+          content: price
+          embedding: null
+          metadata: Product_Name
+        index: productindex
+        kind: acs
+        semantic_configuration_name: null
+    queries: ${inputs.question}
+    query_type: Keyword
+    top_k: 1
+  use_variants: false
+- name: generate_prompt_context
+  type: python
+  source:
+    type: code
+    path: generate_prompt_context.py
+  inputs:
+    search_result: ${Search_queries_from_vectorindex.output}
+  use_variants: false
+- name: Prompt_variants
+  type: prompt
+  source:
+    type: code
+    path: Prompt_variants.jinja2
+  inputs:
+    contexts: ${generate_prompt_context.output}
+    question: ${inputs.question}
+  use_variants: false
+- name: answer_the_question_with_context
+  type: llm
+  source:
+    type: code
+    path: answer_the_question_with_context.jinja2
+  inputs:
+    deployment_name: gpt-35-turbo-16k
+    temperature: 0
+    top_p: 1
+    max_tokens: 300
+    presence_penalty: 0
+    frequency_penalty: 0
+    prompt_text: ${Prompt_variants.output}
+  provider: AzureOpenAI
+  connection: promptflowAI
+  api: chat
+  module: promptflow.tools.aoai
+  use_variants: false
+node_variants: {}
+environment:
+  python_requirements_txt: requirements.txt

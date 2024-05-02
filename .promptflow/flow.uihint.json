@@ -1,0 +1,62 @@
+{
+  "nodes": {
+    "answer_the_question_with_context": {
+      "variant_0": {
+        "inputs": {},
+        "inputsValue": {}
+      }
+    },
+    "Search_queries_from_vectorindex": {
+      "variant_0": {
+        "inputs": {
+          "acs_content_field": [
+            {
+              "display_value": "price",
+              "value": "price"
+            }
+          ],
+          "acs_embedding_field": [],
+          "embedding_deployment": [],
+          "embedding_model": [],
+          "serverless_embedding_connection": [],
+          "mlindex_asset_id": [],
+          "mongodb_collection": [],
+          "mongodb_connection": [],
+          "mongodb_content_field": [],
+          "mongodb_database": [],
+          "mongodb_embedding_field": [],
+          "mongodb_index_name": [],
+          "pinecone_index_connection": [],
+          "pinecone_index_name": [],
+          "semantic_configuration": [],
+          "query_type": [
+            {
+              "display_value": "Keyword",
+              "value": "Keyword"
+            }
+          ]
+        },
+        "inputsValue": {
+          "index_type": "Azure AI Search",
+          "acs_index_connection": "flowsearch",
+          "acs_content_field": "price",
+          "acs_index_name": "productindex",
+          "acs_metadata_field": "Product_Name",
+          "embedding_type": "None"
+        }
+      }
+    },
+    "generate_prompt_context": {
+      "variant_0": {
+        "inputs": {},
+        "inputsValue": {}
+      }
+    },
+    "Prompt_variants": {
+      "variant_0": {
+        "inputs": {},
+        "inputsValue": {}
+      }
+    }
+  }
+}

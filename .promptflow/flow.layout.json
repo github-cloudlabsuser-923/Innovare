@@ -1,0 +1,49 @@
+{
+  "orientation": "Vertical",
+  "nodeLayouts": {
+    "inputs": {
+      "x": 362,
+      "y": 62,
+      "index": -1
+    },
+    "outputs": {
+      "x": 242,
+      "y": 612,
+      "index": -1
+    },
+    "Search_queries_from_vectorindex": {
+      "x": 510,
+      "y": 65,
+      "height": 75,
+      "index": 0
+    },
+    "generate_prompt_context": {
+      "x": 448,
+      "y": 214,
+      "height": 75,
+      "index": 1
+    },
+    "Prompt_variants": {
+      "x": 242,
+      "y": 392,
+      "height": 75,
+      "index": 2
+    },
+    "answer_the_question_with_context": {
+      "x": 242,
+      "y": 502,
+      "height": 75,
+      "index": 3
+    }
+  },
+  "viewport": {
+    "transformMatrix": [
+      1,
+      0,
+      0,
+      1,
+      -34.2421875,
+      235
+    ]
+  }
+}
